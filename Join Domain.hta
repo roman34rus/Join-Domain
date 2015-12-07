@@ -1,0 +1,108 @@
+<html id="appHTML">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta http-equiv="Content-Language" content="ru">
+        <meta http-equiv="MSThemeCompatible" content="yes">
+		
+        <title>Ввод компьютера в домен</title>
+		
+        <hta:Application
+            Id="objApplication"
+            ApplicationName="JoinDomain"
+            Border="normal"
+            BorderStyle="normal"
+            Caption="yes"
+            ContextMenu="no"
+            InnerBorder="yes"
+            MaximizeButton="no"
+            MinimizeButton="yes"
+            Navigable="no"
+            Scroll="auto"
+            ScrollFlat="no"
+            Selection="no"
+            ShowInTaskbar="yes"
+            SingleInstance="yes"
+            SysMenu="yes"
+            Version="1.0"
+            WindowState="normal"
+        />
+        
+		<style type="text/css">
+            BODY {
+                font: x-small Verdana, Arial, sans-serif;
+                color: black;
+                background-color: white;
+            }
+        </style>
+		
+        <script language="VBScript">
+			Sub BodyOnLoad
+				Self.ResizeTo 800,655
+			End Sub
+			
+			Sub JoinDomainClick	
+				ComputerName = Trim(fComputerName.Value)
+				Domain = Trim(fDomain.Value)
+				DC = Trim(fDC.Value)
+				DomainUser = Trim(fDomainUser.Value)
+				DomainPass = Trim(fDomainPass.Value)
+				LocalUser = Trim(fLocalUser.Value)
+				LocalPass = Trim(fLocalPass.Value)
+				OU = Trim(fOU.Value)
+				
+				netdom_cmd = "netdom join " + ComputerName + " /Domain:" + Domain + "\" + DC + " /UserD:" + Domain + "\" + DomainUser + " /PasswordD:"  + DomainPass + " /UserO:" + ComputerName + "\" + LocalUser + " /PasswordO:"  + LocalPass + " /OU:""" + OU + """ /Reboot:0 /Verbose"
+				'MsgBox(netdom_cmd)
+				
+				full_cmd = "%comspec% /Q /C " + netdom_cmd + " & pause"
+				'MsgBox(full_cmd)
+				
+				Set ObjShell = CreateObject("WScript.Shell")
+				ObjShell.Run full_cmd, 1, true
+			End Sub
+        </script>
+    </head>
+
+    <body onload="BodyOnLoad">
+		<p>
+			Для ввода компьютеров в домен необходима утилита netdom.exe. Для Windows 7 и Server 2008 R2 она входит в пакет "Средства удаленного администрирования сервера".
+		</p>
+		<p>
+			Имя или IP-адрес компьютера, который вводится в домен<br>
+            <input type="Text" id="fComputerName" value="pc-name" size="40">
+			</p>
+			<p>
+			Имя доменного пользователя, обладающего правом создания объектов в указанном OU<br>
+            <input type="Text" id="fDomainUser" value="domainuser" size="40">
+		</p>
+		<p>
+			Пароль доменного пользователя<br>
+            <input type="Password" id="fDomainPass" value="" size="40">
+		</p>
+		<p>
+			Имя локального администратора на указанном компьютере<br>
+            <input type="Text" id="fLocalUser" value="Администратор" size="40">
+		</p>
+		<p>
+			Пароль локального администратора<br>
+            <input type="Password" id="fLocalPass" value="" size="40">
+		</p>			
+		<p>
+			Домен<br>
+            <input type="Text" id="fDomain" value="example.com" size="40" disabled>
+		</p>
+		<p>
+			Контроллер домена<br>
+            <input type="Text" id="fDC" value="dc.example.com" size="40" disabled>
+		</p>
+		<p>
+			Organization Unit<br>
+            <input type="Text" id="fOU" value="OU=Computers,OU=Company,DC=example,DC=com" size="110" disabled>
+		</p>
+		<p>
+            <input type="Button" id="fJoinDomain" value="Ввести в домен" onclick="JoinDomainClick">
+        </p>
+		<p align="right">
+			<i>&copy; Любимов Роман, 2013</i>
+    </body>
+</html>
